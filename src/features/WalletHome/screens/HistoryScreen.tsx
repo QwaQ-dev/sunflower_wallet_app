@@ -1,12 +1,13 @@
-import Wrapper from '../../../shared/components/Wrapper';
-import { View, SectionList, ActivityIndicator, Pressable } from 'react-native';
-import { useState, useEffect } from 'react';
-import { useWalletData } from '../../../shared/hooks/useWalletData';
+import { Copy, RefreshCw, Repeat, Send, Upload } from 'lucide-react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, SectionList, View } from 'react-native';
+
 import { useWalletContext } from '../../../providers/WalletContext';
-import { Send, Upload, RefreshCw, Repeat, Copy } from 'lucide-react-native';
-import { CopyToClipboard } from '../../../shared/utils/copyToClipboard';
 import TextWithFont from '../../../shared/components/TextWithFont';
+import Wrapper from '../../../shared/components/Wrapper';
+import { useWalletData } from '../../../shared/hooks/useWalletData';
 import { useWalletScreenStyles } from '../../../shared/hooks/useWalletScreenStyle';
+import { copyToClipboard } from '../../../shared/utils/clipboard';
 
 interface Transaction {
   tx_id: string;
@@ -160,7 +161,7 @@ export default function HistoryScreen() {
               <TextWithFont customStyle="text-sm text-white">
                 TXid: {shortenTxId(item.tx_id)}
               </TextWithFont>
-              <Pressable onPress={() => CopyToClipboard(item.tx_id)} className="p-1">
+              <Pressable onPress={() => copyToClipboard(item.tx_id)} className="p-1">
                 <Copy color="white" size={parseInt(screenStyles.copyIconSize)} strokeWidth={1.5} />
               </Pressable>
             </View>
@@ -178,7 +179,7 @@ export default function HistoryScreen() {
 
   return (
     <Wrapper>
-      <View className={`flex-1 w-full h-full`}>
+      <View className={'flex-1 w-full h-full'}>
         <View className="flex-row justify-between items-center mb-4 border-b-2 border-gray-500 ">
           <TextWithFont customStyle={`${screenStyles.headerTitle} font-bold text-white mb-2`}>
             History
@@ -187,7 +188,11 @@ export default function HistoryScreen() {
             onPress={refreshTransactions}
             className={`rounded-full ${globalStyles.refreshIconSize}`}
           >
-            <RefreshCw color="#FF4800" size={parseInt(globalStyles.refreshIconSize)} className='mb-2'/>
+            <RefreshCw
+              color="#FF4800"
+              size={parseInt(globalStyles.refreshIconSize)}
+              className="mb-2"
+            />
           </Pressable>
         </View>
         {isLoadingWalletData || isLoadingTransactions ? (
@@ -217,7 +222,10 @@ export default function HistoryScreen() {
             renderItem={renderTransaction}
             renderSectionHeader={renderSectionHeader}
             keyExtractor={item => item.tx_id}
-            contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 4 }}
+            contentContainerStyle={{
+              paddingBottom: 20,
+              paddingHorizontal: 4,
+            }}
           />
         )}
       </View>

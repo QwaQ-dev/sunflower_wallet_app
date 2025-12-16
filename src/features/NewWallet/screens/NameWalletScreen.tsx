@@ -1,14 +1,15 @@
-import { View, TextInput, ActivityIndicator } from 'react-native';
-import { Button } from '../../../shared/components/Button';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useState, useEffect } from 'react';
-import Wrapper from '../../../shared/components/Wrapper';
-import { StepIndicator } from '../components/StepIndicator';
-import { createAndSaveWallet } from '../../../shared/walletPersitance';
-import { RootNavigatorTypeParamListType } from '../../../navigation/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, TextInput, View } from 'react-native';
+
+import { RootNavigatorTypeParamListType } from '../../../navigation/types';
+import { Button } from '../../../shared/components/Button';
 import TextWithFont from '../../../shared/components/TextWithFont';
+import Wrapper from '../../../shared/components/Wrapper';
 import { useWalletScreenStyles } from '../../../shared/hooks/useWalletScreenStyle';
+import { createAndSaveWallet } from '../../../shared/walletPersitance';
+import { StepIndicator } from '../components/StepIndicator';
 
 type RouteParams = {
   mnemonic?: string;
@@ -44,7 +45,7 @@ export default function NameWalletScreen() {
         await createAndSaveWallet(mnemonic, walletName);
         navigation.navigate('SuccessScreen', { walletName });
       } catch (error) {
-        console.error('Failed to save mnemonic with name:', error);
+        console.error('Failed to save mnemonic:', error);
       } finally {
         setIsLoading(false);
       }
@@ -96,13 +97,13 @@ export default function NameWalletScreen() {
               onPress={() => navigation.goBack()}
               text="Back"
               customStyle="w-full"
-              disable={isLoading}
+              disabled={isLoading}
             />
             <Button
               onPress={handleNext}
               accent
               text={isLoading ? 'Creating...' : 'Next'}
-              disable={isLoading}
+              disabled={isLoading}
               customStyle={`w-full mt-2 ${walletName.trim().length > 0 && !isLoading ? 'bg-custom_accent' : 'bg-white'}`}
             />
           </View>

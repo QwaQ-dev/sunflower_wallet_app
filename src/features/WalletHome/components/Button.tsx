@@ -1,16 +1,23 @@
 import { Pressable } from 'react-native';
-import { Send, Upload, Settings, RefreshCw, DatabaseIcon, PlusCircle, ArrowRightLeft } from 'lucide-react-native';
+
+import getIconComponent from '../../../shared/components/GetIcon';
 import TextWithFont from '../../../shared/components/TextWithFont';
 import { useWalletScreenStyles } from '../../../shared/hooks/useWalletScreenStyle';
-import getIconComponent from '../../../shared/components/GetIcon';
 
 type ButtonType = {
   onPress?: () => void;
   text: string;
   customStyle?: string;
   accent?: boolean;
-  disable?: boolean;
-  iconName: 'Send' | 'Upload' | 'Settings' | 'RefreshCw' | 'DatabaseIcon' | 'PlusCircle' | 'ArrowRightLeft';
+  disabled?: boolean;
+  iconName:
+    | 'Send'
+    | 'Upload'
+    | 'Settings'
+    | 'RefreshCw'
+    | 'DatabaseIcon'
+    | 'PlusCircle'
+    | 'ArrowRightLeft';
 };
 
 type TextButtonType = {
@@ -25,10 +32,9 @@ export function Button({
   text,
   customStyle,
   accent = false,
-  disable = false,
+  disabled = false,
   iconName,
 }: ButtonType) {
-
   const IconComponent = getIconComponent(iconName);
   const styles = useWalletScreenStyles().button;
 
@@ -38,7 +44,7 @@ export function Button({
       className={`justify-center items-center ${styles.container} flex-row  border-custom_border relative overflow-hidden ${
         accent ? 'bg-custom_accent' : 'bg-custom_complement'
       } ${customStyle ?? ''}`}
-      disabled={disable}
+      disabled={disabled}
     >
       <TextWithFont customStyle={`${accent ? 'text-black' : 'text-white'} ${styles.text} z-10`}>
         {text}
