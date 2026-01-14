@@ -38,7 +38,7 @@ export default function Coin({ token, inMainScreen }: CoinProp) {
                 <TextWithFont
                   customStyle={`text-${token.diff.startsWith('+') ? 'green' : 'red'}-500 ml-1`}
                 >
-                  {token.diff}%
+                  {token.diff}
                 </TextWithFont>
               ))}
           </View>

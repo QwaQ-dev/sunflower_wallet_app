@@ -165,7 +165,7 @@ export default function MainWalletScreen() {
               customStyle="h-full"
             />
           ) : activeTab === 'Actions' ? (
-            <ActionsTab actionsHeight={screenStyles.actionsHeight} />
+            <ActionsTab actionsHeight={screenStyles.actionsHeight} walletName={selectedWallet}/>
           ) : (
             <NftTab />
           )}
