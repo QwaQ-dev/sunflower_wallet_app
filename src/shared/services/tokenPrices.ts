@@ -7,6 +7,8 @@ export async function fetchTokenPrices(ids: string[]) {
         )}&vs_currencies=usd`,
     );
     if (res.status === 429) throw new Error(`Reload prices`)
+    
     if (!res.ok) throw new Error(`Price API error: ${res.status}`);
+
     return res.json();
 }
