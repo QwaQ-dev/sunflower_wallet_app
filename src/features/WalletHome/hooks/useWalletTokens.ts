@@ -1,110 +1,137 @@
-import { useState } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Token } from '../../../shared/types/Token';
 import { PricesData } from '../types/wallet';
 import calculatePriceDiff from '../utils/calculatePriceDiff';
 import { parseStacksTokens } from '../../../shared/utils/parseStacksTokens';
-import { fetchStacksBalances } from '../../../shared/services/stacksBalances';
 import { TOKEN_REGISTRY } from '../../../shared/types/tokenRegistry';
-import { fetchTokenPrices } from '../../../shared/services/tokenPrices';
-import { fetchBtcBalance } from '../../../shared/services/btcBalance';
+import {
+  useStacksBalancesQuery,
+  useBtcBalanceQuery,
+  useTokenPricesQuery
+} from '../../../shared/hooks/useTokenQueries';
 
+export default function useWalletTokens(
+  priceHistory: PricesData | null,
+  stxAddress?: string | null,
+  btcAddress?: string | null
+) {
+  const {
+    data: stacksData,
+    isLoading: isLoadingStacks,
+    error: errorStacks,
+    refetch: refetchStacks,
+  } = useStacksBalancesQuery(stxAddress);
 
-export default function useWalletTokens(priceHistory: PricesData) {
-  const [tokens, setTokens] = useState<Token[]>([]);
-  const [walletBalance, setWalletBalance] = useState<string | null>(null);
-  const [tokenError, setTokenError] = useState<string | null>(null);
-  const [tokenLoading, setTokenLoading] = useState(false);
+  const {
+    data: btcBalance,
+    isLoading: isLoadingBtc,
+    error: errorBtc,
+    refetch: refetchBtc,
+  } = useBtcBalanceQuery(btcAddress);
 
-  const fetchTokensCosts = async (stxAddress: string, btcAddress: string) => {
-    try {
-      setTokenLoading(true);
-      setTokenError(null);
+  // Derive price IDs ** not working for fungible tokens ** 
+  const parsedTokens = useMemo(() => {
+    return stxAddress && stacksData?.fungible_tokens
+      ? parseStacksTokens(stacksData.fungible_tokens)
+      : [];
+  }, [stxAddress, stacksData]);
 
-      const result: Token[] = [];
-      let totalUsd = 0;
+  // Derive price IDs for all tokens to fetch their prices
+  const priceIds = useMemo(() => [
+    TOKEN_REGISTRY.STX.coingeckoId!,
+    'bitcoin',
+    ...parsedTokens
+      .map(t => t?.coingeckoId)
+      .filter((id): id is string => !!id),
+  ], [parsedTokens]);
 
-      // STX + fungible tokens
-      if (stxAddress) {
-        const data = await fetchStacksBalances(stxAddress);
+  const {
+    data: prices,
+    isLoading: isLoadingPrices,
+    error: errorPrices,
+    refetch: refetchPrices,
+  } = useTokenPricesQuery(priceIds);
 
-        const stxRaw = Number(data.stx.balance);
-        const stxBalance = (stxRaw / 1e6).toFixed(6);
+  // Aggregates data from multiple sources (Stacks, BTC, CoinGecko) 
+  // into a single list of tokens with prices and USD values.
+  const tokens: Token[] = useMemo(() => {
+    const result: Token[] = [];
 
-        const parsedTokens = parseStacksTokens(data.fungible_tokens);
+    // Combine Stacks data (STX + SIP-010) with prices
+    if (stacksData && prices) {
+      const stxRaw = Number(stacksData.stx.balance);
+      const stxBalance = (stxRaw / 1e6).toFixed(6);
+      const stxPrice = prices.blockstack?.usd ?? 0;
+      const stxUsd = Number(stxBalance) * stxPrice;
 
-        const priceIds = [
-          TOKEN_REGISTRY.STX.coingeckoId!,
-          ...parsedTokens.map(t => t.coingeckoId).filter(Boolean),
-        ];
+      result.push({
+        name: 'Stacks',
+        symbol: 'STX',
+        balance: stxBalance,
+        cost: stxPrice.toString(),
+        balanceUsd: stxUsd.toFixed(2),
+        diff: calculatePriceDiff(priceHistory?.stx).data,
+      });
 
-        const prices = await fetchTokenPrices(priceIds);
-
-        // STX
-        const stxPrice = prices.blockstack?.usd ?? 0;
-        const stxUsd = Number(stxBalance) * stxPrice;
+      // Map Fungible Tokens (SIP-010) 
+      for (const t of parsedTokens) {
+        if (!t) continue; // Safety check for TypeScript
+        const price = prices[t.coingeckoId!]?.usd ?? 0;
+        const usd = Number(t.balance) * price;
 
         result.push({
-          name: 'Stacks',
-          symbol: 'STX',
-          balance: stxBalance,
-          cost: stxPrice.toString(),
-          balanceUsd: stxUsd.toFixed(2),
-          diff: calculatePriceDiff(priceHistory?.stx).data,
-        });
-
-        totalUsd += stxUsd;
-
-        // SIP-010 tokens
-        for (const t of parsedTokens) {
-          const price = prices[t.coingeckoId!]?.usd ?? 0;
-          const usd = Number(t.balance) * price;
-
-          result.push({
-            name: t.name,
-            symbol: t.symbol,
-            balance: t.balance,
-            cost: price.toString(),
-            balanceUsd: usd.toFixed(2),
-          });
-
-          totalUsd += usd;
-        }
-      }
-
-      // BTC
-      if (btcAddress) {
-        const btcBalance = await fetchBtcBalance(btcAddress);
-        const prices = await fetchTokenPrices(['bitcoin']);
-        const btcPrice = prices.bitcoin?.usd ?? 0;
-        const usd = Number(btcBalance) * btcPrice;
-
-        result.push({
-          name: 'Bitcoin',
-          symbol: 'BTC',
-          balance: btcBalance,
-          cost: btcPrice.toString(),
+          name: t.name,
+          symbol: t.symbol,
+          balance: t.balance,
+          cost: price.toString(),
           balanceUsd: usd.toFixed(2),
-          diff: calculatePriceDiff(priceHistory?.btc).data,
         });
-
-        totalUsd += usd;
       }
-
-      setTokens(result);
-      setWalletBalance(totalUsd.toFixed(2));
-    } catch (e) {
-      setTokenError(e instanceof Error ? e.message : 'Unknown error');
-      setWalletBalance('0.00');
-    } finally {
-      setTokenLoading(false);
     }
-  };
+
+    // Add Bitcoin balance derived from blockstream.info + bitcoin coingecko price
+    if (btcBalance && prices) {
+      const btcPrice = prices.bitcoin?.usd ?? 0;
+      const usd = Number(btcBalance) * btcPrice;
+
+      result.push({
+        name: 'Bitcoin',
+        symbol: 'BTC',
+        balance: btcBalance,
+        cost: btcPrice.toString(),
+        balanceUsd: usd.toFixed(2),
+        diff: calculatePriceDiff(priceHistory?.btc).data,
+      });
+    }
+
+    return result;
+  }, [stacksData, btcBalance, prices, parsedTokens, priceHistory]);
+
+  // Combined portfolio balance in USD
+  const walletBalance = useMemo(() => {
+    return tokens
+      .reduce((acc, token) => acc + Number(token.balanceUsd), 0)
+      .toFixed(2);
+  }, [tokens]);
+
+  /**
+   * Manually triggers a reload of all balance/price data.
+   * Wrapped in useCallback to ensure it remains stable when passed to other hooks (like useFocusEffect).
+   */
+  const fetchTokensCosts = useCallback(() => {
+    refetchStacks();
+    refetchBtc();
+    refetchPrices();
+  }, [refetchStacks, refetchBtc, refetchPrices]);
+
+  const isLoading = isLoadingStacks || isLoadingBtc || isLoadingPrices;
+  const error = errorStacks?.message || errorBtc?.message || errorPrices?.message || null;
 
   return {
     tokens,
     walletBalance,
-    tokenError,
-    tokenLoading,
+    tokenError: error,
+    tokenLoading: isLoading,
     fetchTokensCosts,
   };
 }

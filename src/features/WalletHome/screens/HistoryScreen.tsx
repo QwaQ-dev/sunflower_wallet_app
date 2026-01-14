@@ -17,6 +17,7 @@ interface Transaction {
   sender_address: string;
   timestamp: number;
   tx_status: string;
+  contract_name?: string;
 }
 
 export default function HistoryScreen() {
@@ -44,17 +45,25 @@ export default function HistoryScreen() {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
-      const txs = data.results.map((tx: any) => ({
-        tx_id: tx.tx_id,
-        tx_type: tx.tx_type,
-        amount: tx.token_transfer?.amount
-          ? (Number(tx.token_transfer.amount) / 1e6).toFixed(6)
-          : '0',
-        recipient_address: tx.token_transfer?.recipient_address || 'N/A',
-        sender_address: tx.sender_address || 'N/A',
-        timestamp: tx.burn_block_time_iso ? new Date(tx.burn_block_time_iso).getTime() : Date.now(),
-        tx_status: tx.tx_status || 'pending',
-      }));
+      const txs = data.results.map((tx: any) => {
+        let contractName = undefined;
+        if (tx.tx_type === 'contract_call' && tx.contract_call?.contract_id) {
+          contractName = tx.contract_call.contract_id.split('.')[1];
+        }
+
+        return {
+          tx_id: tx.tx_id,
+          tx_type: tx.tx_type,
+          amount: tx.token_transfer?.amount
+            ? (Number(tx.token_transfer.amount) / 1e6).toFixed(6)
+            : '0',
+          recipient_address: tx.token_transfer?.recipient_address || 'N/A',
+          sender_address: tx.sender_address || 'N/A',
+          timestamp: tx.burn_block_time_iso ? new Date(tx.burn_block_time_iso).getTime() : Date.now(),
+          tx_status: tx.tx_status || 'pending',
+          contract_name: contractName,
+        };
+      });
 
       setTransactions(txs);
     } catch (err) {
@@ -82,7 +91,7 @@ export default function HistoryScreen() {
 
     switch (tx.tx_type) {
       case 'contract_call':
-        return { icon: Repeat, label: 'Swap' };
+        return { icon: Repeat, label: tx.contract_name || 'Swap' };
       case 'coinbase':
         return { icon: Upload, label: 'Received' };
       default:
@@ -120,9 +129,8 @@ export default function HistoryScreen() {
       <View className="w-full mb-2">
         <Pressable
           onPress={() => setExpandedTxId(isExpanded ? null : item.tx_id)}
-          className={`flex-row justify-between items-center w-full bg-custom_complement rounded-lg border-2 border-custom_border ${
-            isExpanded ? 'border-b-0 rounded-b-none' : ''
-          } ${screenStyles.txContainer}`}
+          className={`flex-row justify-between items-center w-full bg-custom_complement rounded-lg border-2 border-custom_border ${isExpanded ? 'border-b-0 rounded-b-none' : ''
+            } ${screenStyles.txContainer}`}
         >
           <View className="flex-row items-center">
             <IconComponent
@@ -144,9 +152,8 @@ export default function HistoryScreen() {
               {item.amount} STX
             </TextWithFont>
             <TextWithFont
-              customStyle={`${screenStyles.txStatus} ${
-                item.tx_status === 'success' ? 'text-green-500' : 'text-yellow-500'
-              }`}
+              customStyle={`${screenStyles.txStatus} ${item.tx_status === 'success' ? 'text-green-500' : 'text-yellow-500'
+                }`}
             >
               {item.tx_status}
             </TextWithFont>

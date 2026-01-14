@@ -8,9 +8,9 @@ export function parseStacksTokens(fungibleTokens: Record<string, any>) {
             if (!config) return null;
 
             const raw = Number(value.balance);
-            // if (raw <= 0) return null; // Delete all 0 values
+            if (raw <= 0) return null; // Delete all 0 values
 
-            const balance = (raw /10 ** config.decimals).toFixed(config.decimals);
+            const balance = (raw / 10 ** config.decimals).toFixed(config.decimals);
 
             return {
                 key,
@@ -20,5 +20,5 @@ export function parseStacksTokens(fungibleTokens: Record<string, any>) {
                 coingeckoId: config.coingeckoId,
             };
         })
-        .filter(Boolean);
+        .filter((item): item is NonNullable<typeof item> => !!item);
 }

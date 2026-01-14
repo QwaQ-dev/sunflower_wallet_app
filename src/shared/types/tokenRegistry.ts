@@ -1,9 +1,9 @@
 export type TokenConfig = {
-    key: string;
-    name: string;
-    symbol: string;
-    decimals: number;
-    coingeckoId?: string;
+  key: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  coingeckoId?: string;
 }
 
 export const TOKEN_REGISTRY: Record<string, TokenConfig> = {
@@ -22,7 +22,7 @@ export const TOKEN_REGISTRY: Record<string, TokenConfig> = {
     decimals: 6,
     coingeckoId: 'ststx',
   },
-  'SPN5AKG35QZSK2M8GAMR4AFX45659RJHDW353HSG.usdh-token-v1::usdh"': {
+  'SPN5AKG35QZSK2M8GAMR4AFX45659RJHDW353HSG.usdh-token-v1::usdh': {
     key: 'SPN5AKG35QZSK2M8GAMR4AFX45659RJHDW353HSG.usdh-token-v1::usdh',
     name: 'USDh',
     symbol: 'USDh',

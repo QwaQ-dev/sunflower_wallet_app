@@ -1,7 +1,7 @@
 import { View, Pressable, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, DatabaseIcon } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 
@@ -29,17 +29,17 @@ const STAKING_PROTOCOLS = [
 const POOLS_PROTOCOLS = [
   {
     id: 'alex',
-    name: 'ALEX',
+    name: 'ALEX pool',
     icon: 'Layers',
     apy: 'Dynamic',
-    description: 'AMM Pool v2'
+    description: 'STX-ALEX'
   }
 ];
 
 const BORROW_PROTOCOLS = [
   {
     id: 'zest',
-    name: 'Zest Protocol',
+    name: 'BTCz Protocol',
     icon: 'Database',
     apy: 'Dynamic',
     description: 'Bitcoin Lending'
@@ -52,7 +52,6 @@ export default function MainBTCfiScreen() {
   const { walletName } = route.params as RouteParams;
   const [activeTab, setActiveTab] = useState('Stake');
   const [selectedProtocol, setSelectedProtocol] = useState<string | null>(null);
-
   const handleProtocolSelect = (id: string) => {
     setSelectedProtocol(id);
   }
@@ -73,15 +72,14 @@ export default function MainBTCfiScreen() {
   const renderProtocolDetail = () => {
     switch (selectedProtocol) {
       case 'stacking-dao': return <StackingDaoCard walletName={walletName} />;
-      case 'alex': return <AlexPoolCard walletName={walletName}/>;
-      case 'zest': return <BTCzCard walletName={walletName}/>
+      case 'alex': return <AlexPoolCard walletName={walletName} />;
+      case 'zest': return <BTCzCard walletName={walletName} />
       default: return null;
     }
   }
 
   return (
     <SafeAreaView className="flex-1 bg-custom_background px-4">
-      {/* Header */}
       <View className="flex-row items-center justify-between py-4">
         <Pressable onPress={() => navigation.goBack()} className="p-2">
           <ChevronLeft color="white" size={24} />
@@ -95,11 +93,11 @@ export default function MainBTCfiScreen() {
         {TABS.map((tab) => (
           <Pressable
             key={tab}
-            onPress={() => { setActiveTab(tab); setSelectedProtocol(null);}}
-            className={`flex-1 py-3 items-center justify-center ${activeTab === tab ?'bg-custom_accent' : 'bg-custom_complement'} border-r-2 border-custom_border`}
+            onPress={() => { setActiveTab(tab); setSelectedProtocol(null); }}
+            className={`flex-1 py-3 items-center justify-center ${activeTab === tab ? 'bg-custom_accent' : 'bg-custom_complement'} border-r-2 border-custom_border`}
           >
             <TextWithFont
-              customStyle={`${activeTab === tab ? 'text-black': 'text-white'}`}
+              customStyle={`${activeTab === tab ? 'text-black' : 'text-white'}`}
             >
               {tab}
             </TextWithFont>
@@ -118,8 +116,7 @@ export default function MainBTCfiScreen() {
               >
                 <View className="flex-row items-center gap-4">
                   <View className="w-10 h-10 bg-custom_background rounded-full items-center justify-center">
-                    {/* Placeholder icon logic */}
-                    <View className="w-6 h-6 bg-gray-500 rounded-full" />
+                    <DatabaseIcon strokeWidth={2} color={"#fff"} />
                   </View>
                   <View>
                     <TextWithFont customStyle="text-white text-lg font-bold">{protocol.name}</TextWithFont>

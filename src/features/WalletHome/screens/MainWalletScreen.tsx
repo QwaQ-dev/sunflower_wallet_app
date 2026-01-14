@@ -1,7 +1,7 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Copy, RefreshCcw } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { ActivityIndicator, Image, Pressable, View } from 'react-native';
 
 import type { RootNavigatorTypeParamListType } from '../../../navigation/types';
@@ -50,6 +50,8 @@ export default function MainWalletScreen() {
 
   const { tokens, tokenError, tokenLoading, walletBalance, fetchTokensCosts } = useWalletTokens(
     priceHistory.data,
+    walletData?.stxAddress,
+    walletData?.btcAddress
   );
   const priceHistoryForGraph = preparePricesForGraph(tokens, priceHistory.data);
   const [activeTab, setActiveTab] = useState<'Tokens' | 'Actions' | 'NFT'>('Tokens');
@@ -58,14 +60,14 @@ export default function MainWalletScreen() {
   const screenStyles = useWalletScreenStyles().mainWalletScreen;
 
   useEffect(() => {
-    if (walletData?.stxAddress && walletData?.btcAddress) {
-      fetchTokensCosts(walletData.stxAddress, walletData.btcAddress);
-    }
-  }, [walletData]);
-
-  useEffect(() => {
     if (selectedWallet) setWalletName(selectedWallet);
   }, [selectedWallet]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchTokensCosts();
+    }, [fetchTokensCosts])
+  );
 
   const handleSend = (tokensForChoose: Token[]) => {
     if (!selectedWallet) return;
@@ -81,7 +83,7 @@ export default function MainWalletScreen() {
         <View className={`flex-row justify-around items-center ${screenStyles.headerGap}`}>
           <Pressable
             onPress={() =>
-              walletData && fetchTokensCosts(walletData.stxAddress, walletData.btcAddress)
+              fetchTokensCosts()
             }
           >
             <RefreshCcw
@@ -165,7 +167,7 @@ export default function MainWalletScreen() {
               customStyle="h-full"
             />
           ) : activeTab === 'Actions' ? (
-            <ActionsTab actionsHeight={screenStyles.actionsHeight} walletName={selectedWallet}/>
+            <ActionsTab actionsHeight={screenStyles.actionsHeight} walletName={selectedWallet} />
           ) : (
             <NftTab />
           )}
