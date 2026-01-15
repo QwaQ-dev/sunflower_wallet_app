@@ -72,6 +72,7 @@ export default function useWalletTokens(
         cost: stxPrice.toString(),
         balanceUsd: stxUsd.toFixed(2),
         diff: calculatePriceDiff(priceHistory?.stx).data,
+        coingeckoId: 'blockstack',
       });
 
       // Map Fungible Tokens (SIP-010) 
@@ -86,6 +87,9 @@ export default function useWalletTokens(
           balance: t.balance,
           cost: price.toString(),
           balanceUsd: usd.toFixed(2),
+          key: t.key,
+          isDeFi: t.isDeFi,
+          coingeckoId: t.coingeckoId,
         });
       }
     }
@@ -102,6 +106,7 @@ export default function useWalletTokens(
         cost: btcPrice.toString(),
         balanceUsd: usd.toFixed(2),
         diff: calculatePriceDiff(priceHistory?.btc).data,
+        coingeckoId: 'bitcoin',
       });
     }
 

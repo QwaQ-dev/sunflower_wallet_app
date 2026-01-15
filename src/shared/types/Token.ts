@@ -6,4 +6,6 @@ export interface Token {
   balance: string;
   diff?: string | null;
   key?: string; // Full contract identifier
+  isDeFi?: boolean;
+  coingeckoId?: string;
 }

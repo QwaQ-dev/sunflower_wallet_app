@@ -1,7 +1,7 @@
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Copy, RefreshCcw } from 'lucide-react-native';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { ActivityIndicator, Image, Pressable, View } from 'react-native';
 
 import type { RootNavigatorTypeParamListType } from '../../../navigation/types';
@@ -53,7 +53,9 @@ export default function MainWalletScreen() {
     walletData?.stxAddress,
     walletData?.btcAddress
   );
-  const priceHistoryForGraph = preparePricesForGraph(tokens, priceHistory.data);
+
+  const filteredTokens = useMemo(() => tokens.filter(t => !t.isDeFi), [tokens]);
+  const priceHistoryForGraph = preparePricesForGraph(filteredTokens, priceHistory.data);
   const [activeTab, setActiveTab] = useState<'Tokens' | 'Actions' | 'NFT'>('Tokens');
 
   const globalStyles = useWalletScreenStyles().global;
@@ -107,7 +109,7 @@ export default function MainWalletScreen() {
           <View className={`flex-row ${screenStyles.sendReceiveButtonGap}`}>
             <Button
               text="Send"
-              onPress={() => handleSend(tokens)}
+              onPress={() => handleSend(filteredTokens)}
               customStyle="w-1/2"
               iconName="Send"
             />
@@ -117,7 +119,7 @@ export default function MainWalletScreen() {
                 selectedWallet &&
                 navigation.navigate('ReceiveScreen', {
                   walletName: selectedWallet,
-                  tokens,
+                  tokens: filteredTokens,
                 })
               }
               customStyle="w-1/2"
@@ -161,7 +163,7 @@ export default function MainWalletScreen() {
             <TextWithFont customStyle="text-red-500 text-center">{error}</TextWithFont>
           ) : activeTab === 'Tokens' ? (
             <TokenList
-              tokens={tokens}
+              tokens={filteredTokens}
               isLoading={tokenLoading}
               error={tokenError}
               customStyle="h-full"

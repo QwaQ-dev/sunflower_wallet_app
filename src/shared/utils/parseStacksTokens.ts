@@ -18,6 +18,7 @@ export function parseStacksTokens(fungibleTokens: Record<string, any>) {
                 symbol: config.symbol,
                 balance,
                 coingeckoId: config.coingeckoId,
+                isDeFi: config.isDeFi,
             };
         })
         .filter((item): item is NonNullable<typeof item> => !!item);

@@ -4,6 +4,7 @@ export type TokenConfig = {
   symbol: string;
   decimals: number;
   coingeckoId?: string;
+  isDeFi?: boolean;
 }
 
 export const TOKEN_REGISTRY: Record<string, TokenConfig> = {
@@ -21,6 +22,7 @@ export const TOKEN_REGISTRY: Record<string, TokenConfig> = {
     symbol: 'stSTX',
     decimals: 6,
     coingeckoId: 'ststx',
+    isDeFi: true,
   },
   'SPN5AKG35QZSK2M8GAMR4AFX45659RJHDW353HSG.usdh-token-v1::usdh': {
     key: 'SPN5AKG35QZSK2M8GAMR4AFX45659RJHDW353HSG.usdh-token-v1::usdh',
@@ -83,5 +85,13 @@ export const TOKEN_REGISTRY: Record<string, TokenConfig> = {
     name: 'Bitflow STX-stSTX LP',
     symbol: 'STX-stSTX-LP',
     decimals: 6,
+    isDeFi: true,
+  },
+  'SP2VCQYTC9SYVQ37Y3G6T08C6TYPPCQ086K3P6MB.btcz-token::btcz': {
+    key: 'SP2VCQYTC9SYVQ37Y3G6T08C6TYPPCQ086K3P6MB.btcz-token::btcz',
+    name: 'BTCz Token',
+    symbol: 'BTCz',
+    decimals: 8,
+    isDeFi: true,
   },
 };

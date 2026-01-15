@@ -1,7 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ArrowLeft } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { RootNavigatorTypeParamListType } from '../../../navigation/types';
@@ -37,6 +37,8 @@ export default function ChooseCoinScreen() {
     walletData?.btcAddress
   );
 
+  const filteredTokens = useMemo(() => tokens.filter(t => !t.isDeFi), [tokens]);
+
   const handleTokenSelect = (token: Token) => {
     if (!walletName) {
       console.log('No wallet name available');
@@ -45,7 +47,16 @@ export default function ChooseCoinScreen() {
     navigation.navigate('SendScreen', { token, walletName });
   };
 
-  if (!tokens || tokens.length === 0) {
+  if (!filteredTokens || filteredTokens.length === 0) {
+    if (tokenLoading) {
+      return (
+        <Wrapper>
+          <View className="flex-1 justify-center items-center">
+            <TextWithFont customStyle="text-white">Loading tokens...</TextWithFont>
+          </View>
+        </Wrapper>
+      );
+    }
     return (
       <Wrapper>
         <View className="flex-col flex-1 p-4">
@@ -84,7 +95,7 @@ export default function ChooseCoinScreen() {
           </View>
         ) : (
           <TokenList
-            tokens={tokens}
+            tokens={filteredTokens}
             isLoading={tokenLoading}
             error={tokenError}
             onTokenPress={handleTokenSelect}
