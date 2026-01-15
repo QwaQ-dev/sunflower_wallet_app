@@ -43,4 +43,45 @@ export const TOKEN_REGISTRY: Record<string, TokenConfig> = {
     decimals: 6,
     coingeckoId: 'sBTC',
   },
-}
+  'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-alex::alex': {
+    key: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-alex::alex',
+    name: 'ALEX Token',
+    symbol: 'ALEX',
+    decimals: 8,
+    coingeckoId: 'alexgo',
+  },
+  'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-wstx-v2::wstx': {
+    key: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-wstx-v2::wstx',
+    name: 'Wrapped STX v2',
+    symbol: 'wSTX',
+    decimals: 8,
+    coingeckoId: 'blockstack',
+  },
+  'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-wstx::wstx': {
+    key: 'SP102V8P0F7JX67ARQ77WEA3D3CFB5XW39REDT0AM.token-wstx::wstx',
+    name: 'Wrapped STX v1',
+    symbol: 'wSTX',
+    decimals: 8,
+    coingeckoId: 'blockstack',
+  },
+  'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.age000-governance-token::alex': {
+    key: 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.age000-governance-token::alex',
+    name: 'ALEX Governance Token',
+    symbol: 'ALEX',
+    decimals: 8,
+    coingeckoId: 'alexgo',
+  },
+  'SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.wstx::wstx': {
+    key: 'SP1Y5YSTAHZ88XYK1VPDH24GY0HPX5J4JECTMY4A1.wstx::wstx',
+    name: 'Velar Wrapped STX',
+    symbol: 'wSTX',
+    decimals: 6,
+    coingeckoId: 'blockstack',
+  },
+  'SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.stableswap-pool-stx-ststx-v-1-4::pool-token': {
+    key: 'SM1793C4R5PZ4NS4VQ4WMP7SKKYVH8JZEWSZ9HCCR.stableswap-pool-stx-ststx-v-1-4::pool-token',
+    name: 'Bitflow STX-stSTX LP',
+    symbol: 'STX-stSTX-LP',
+    decimals: 6,
+  },
+};

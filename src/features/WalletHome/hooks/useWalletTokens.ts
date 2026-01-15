@@ -31,6 +31,7 @@ export default function useWalletTokens(
 
   // Derive price IDs ** not working for fungible tokens ** 
   const parsedTokens = useMemo(() => {
+    console.log(stacksData?.fungible_tokens)
     return stxAddress && stacksData?.fungible_tokens
       ? parseStacksTokens(stacksData.fungible_tokens)
       : [];

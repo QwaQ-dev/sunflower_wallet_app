@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { RootNavigatorTypeParamListType } from '../../../navigation/types';
 import TextWithFont from '../../../shared/components/TextWithFont';
 import StackingDaoCard from '../components/stake/StakingDAO';
-import AlexPoolCard from '../components/pool/AlexPool';
+import BitflowPoolCard from '../components/pool/BitflowPool';
 import BTCzCard from '../components/borrow/BTCz';
 
 type MainBTCfiScreenProp = NativeStackNavigationProp<RootNavigatorTypeParamListType, 'MainBTCfiScreen'>;
@@ -28,11 +28,11 @@ const STAKING_PROTOCOLS = [
 
 const POOLS_PROTOCOLS = [
   {
-    id: 'alex',
-    name: 'ALEX pool',
+    id: 'bitflow',
+    name: 'Bitflow pool',
     icon: 'Layers',
     apy: 'Dynamic',
-    description: 'STX-ALEX'
+    description: 'STX-stSTX'
   }
 ];
 
@@ -72,7 +72,7 @@ export default function MainBTCfiScreen() {
   const renderProtocolDetail = () => {
     switch (selectedProtocol) {
       case 'stacking-dao': return <StackingDaoCard walletName={walletName} />;
-      case 'alex': return <AlexPoolCard walletName={walletName} />;
+      case 'bitflow': return <BitflowPoolCard walletName={walletName} />;
       case 'zest': return <BTCzCard walletName={walletName} />
       default: return null;
     }

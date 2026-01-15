@@ -5,4 +5,5 @@ export interface Token {
   balanceUsd: string;
   balance: string;
   diff?: string | null;
+  key?: string; // Full contract identifier
 }
